@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Collection, MessageFlags, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, MessageFlags, ActivityType, EmbedBuilder } = require('discord.js');
+const { get } = require('./src/utils/guildConfig');
 const { Player } = require('discord-player');
 const { PlayDLExtractor } = require('./src/extractors/PlayDLExtractor');
 const fs = require('fs');
@@ -17,6 +18,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
   ],
 });
 
@@ -115,6 +117,34 @@ client.on('interactionCreate', async interaction => {
     } catch {
       // interaccion expirada, ignorar
     }
+  }
+});
+
+// ─── Bienvenida y auto-rol ────────────────────────────────────────────────────
+client.on('guildMemberAdd', async member => {
+  const cfg = get(member.guild.id);
+
+  // Auto-rol
+  if (cfg.autoRole) {
+    const role = member.guild.roles.cache.get(cfg.autoRole);
+    if (role) member.roles.add(role).catch(() => {});
+  }
+
+  // Mensaje de bienvenida
+  if (cfg.welcomeChannel) {
+    const channel = member.guild.channels.cache.get(cfg.welcomeChannel);
+    if (!channel) return;
+
+    const mensaje = (cfg.welcomeMessage || 'Bienvenido {user} al servidor!')
+      .replace('{user}', `<@${member.id}>`);
+
+    const embed = new EmbedBuilder()
+      .setColor('#FFD700')
+      .setDescription(mensaje)
+      .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+      .setFooter({ text: `Miembro #${member.guild.memberCount}` });
+
+    channel.send({ embeds: [embed] }).catch(() => {});
   }
 });
 
