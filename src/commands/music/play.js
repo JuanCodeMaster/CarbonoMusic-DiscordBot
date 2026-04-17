@@ -83,7 +83,7 @@ module.exports = {
 
       return interaction.followUp({ embeds: [embed] });
     } catch (err) {
-      return interaction.followUp({ content: `Error: ${err.message}` });
+      return interaction.followUp({ content: 'No se pudo reproducir la cancion. Intentalo de nuevo.', flags: MessageFlags.Ephemeral });
     }
   },
 };

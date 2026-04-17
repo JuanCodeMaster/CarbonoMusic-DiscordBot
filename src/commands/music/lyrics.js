@@ -56,7 +56,7 @@ module.exports = {
 
       return interaction.followUp({ embeds: [embed] });
     } catch (err) {
-      return interaction.followUp({ content: `No pude obtener la letra: ${err.message}` });
+      return interaction.followUp({ content: 'No se pudo obtener la letra. Intentalo de nuevo.' });
     }
   },
 };
