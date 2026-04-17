@@ -19,8 +19,9 @@ COPY package*.json ./
 RUN npm install --omit=dev --ignore-scripts
 
 # Descargar manualmente el binario de yt-dlp para Linux
-RUN wget -q -O node_modules/yt-dlp-exec/bin/yt-dlp \
-    https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+RUN mkdir -p node_modules/yt-dlp-exec/bin \
+    && wget -q -O node_modules/yt-dlp-exec/bin/yt-dlp \
+        https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
     && chmod +x node_modules/yt-dlp-exec/bin/yt-dlp
 
 # Copiar el resto del codigo
