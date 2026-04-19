@@ -19,7 +19,6 @@
     "dotenv": "^17.4.2",
     "genius-lyrics": "^4.4.7",
     "play-dl": "^1.9.7",
-    "youtube-dl-exec": "^3.1.5",
     "yt-dlp-exec": "^1.0.2"
   }
 }

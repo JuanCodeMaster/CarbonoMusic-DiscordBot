@@ -1,9 +1,7 @@
 FROM node:20-slim
 
-# Instalar ffmpeg y dependencias del sistema
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    python3 \
     wget \
     ca-certificates \
     libfontconfig1 \
@@ -12,18 +10,21 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copiar package files
 COPY package*.json ./
 
-RUN npm install --omit=dev
+# Instalar sin ejecutar scripts de postinstall que fallan en Linux
+RUN npm install --omit=dev --ignore-scripts
 
-# Descargar manualmente el binario de yt-dlp para Linux
+# @napi-rs/canvas: instalar el binario correcto para Linux manualmente
+RUN node -e "require('@napi-rs/canvas')" 2>/dev/null || \
+    npm install --omit=dev --ignore-scripts @napi-rs/canvas-linux-x64-gnu 2>/dev/null || true
+
+# Descargar yt-dlp para Linux
 RUN mkdir -p node_modules/yt-dlp-exec/bin \
     && wget -q -O node_modules/yt-dlp-exec/bin/yt-dlp \
         https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
     && chmod +x node_modules/yt-dlp-exec/bin/yt-dlp
 
-# Copiar el resto del codigo
 COPY . .
 
 CMD ["node", "index.js"]
