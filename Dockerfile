@@ -12,12 +12,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-# Instalar sin ejecutar scripts de postinstall que fallan en Linux
+# Instalar sin scripts (evita preinstall de yt-dlp-exec que requiere python)
 RUN npm install --omit=dev --ignore-scripts
 
-# @napi-rs/canvas: instalar el binario correcto para Linux manualmente
-RUN node -e "require('@napi-rs/canvas')" 2>/dev/null || \
-    npm install --omit=dev --ignore-scripts @napi-rs/canvas-linux-x64-gnu 2>/dev/null || true
+# Instalar binario nativo de canvas para Linux x64 (siempre, sin condición)
+RUN npm install --ignore-scripts @napi-rs/canvas-linux-x64-gnu
 
 # Descargar yt-dlp para Linux
 RUN mkdir -p node_modules/yt-dlp-exec/bin \
