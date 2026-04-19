@@ -128,7 +128,13 @@ client.on('guildMemberAdd', async member => {
   // Auto-rol
   if (cfg.autoRole) {
     const role = member.guild.roles.cache.get(cfg.autoRole);
-    if (role) member.roles.add(role).catch(() => {});
+    if (!role) {
+      console.error(`[AutoRole] Rol ${cfg.autoRole} no encontrado en ${member.guild.name}`);
+    } else {
+      member.roles.add(role).catch(err => {
+        console.error(`[AutoRole] No se pudo asignar el rol: ${err.message}`);
+      });
+    }
   }
 
   // Mensaje de bienvenida

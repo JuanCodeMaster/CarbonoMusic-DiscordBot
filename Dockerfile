@@ -15,9 +15,7 @@ WORKDIR /app
 # Copiar package files
 COPY package*.json ./
 
-# Instalar dependencias ignorando postinstall scripts que fallan en Linux
-# (ffmpeg-static intenta verificar su binario de Windows aqui)
-RUN npm install --omit=dev --ignore-scripts
+RUN npm install --omit=dev
 
 # Descargar manualmente el binario de yt-dlp para Linux
 RUN mkdir -p node_modules/yt-dlp-exec/bin \
