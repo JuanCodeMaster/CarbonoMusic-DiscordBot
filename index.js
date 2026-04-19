@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection, MessageFlags, ActivityType, EmbedBuilder } = require('discord.js');
 const { get } = require('./src/utils/guildConfig');
+const { generateWelcomeCard } = require('./src/utils/welcomeCard');
 const { Player } = require('discord-player');
 const { PlayDLExtractor } = require('./src/extractors/PlayDLExtractor');
 const fs = require('fs');
@@ -138,13 +139,32 @@ client.on('guildMemberAdd', async member => {
     const mensaje = (cfg.welcomeMessage || 'Bienvenido {user} al servidor!')
       .replace('{user}', `<@${member.id}>`);
 
-    const embed = new EmbedBuilder()
-      .setColor('#FFD700')
-      .setDescription(mensaje)
-      .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-      .setFooter({ text: `Miembro #${member.guild.memberCount}` });
+    try {
+      const avatarUrl = member.user.displayAvatarURL({ extension: 'png', size: 256 });
+      const cardBuffer = await generateWelcomeCard({
+        username:    member.user.username,
+        avatarUrl,
+        memberCount: member.guild.memberCount,
+        serverName:  member.guild.name,
+      });
 
-    channel.send({ embeds: [embed] }).catch(() => {});
+      const { AttachmentBuilder } = require('discord.js');
+      const attachment = new AttachmentBuilder(cardBuffer, { name: 'welcome.png' });
+
+      const embed = new EmbedBuilder()
+        .setColor('#FFD700')
+        .setDescription(mensaje)
+        .setImage('attachment://welcome.png');
+
+      channel.send({ embeds: [embed], files: [attachment] }).catch(() => {});
+    } catch {
+      // Si falla la imagen, manda solo el texto
+      const embed = new EmbedBuilder()
+        .setColor('#FFD700')
+        .setDescription(mensaje)
+        .setThumbnail(member.user.displayAvatarURL({ dynamic: true }));
+      channel.send({ embeds: [embed] }).catch(() => {});
+    }
   }
 });
 
