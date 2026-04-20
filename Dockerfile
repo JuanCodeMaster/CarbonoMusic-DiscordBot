@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
     libfontconfig1 \
+    python3 \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
